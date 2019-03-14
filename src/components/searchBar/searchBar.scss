@@ -1,0 +1,17 @@
+.search-bar {
+  width: 250px;
+  height: 38px;
+  margin-right: 20px;
+  position: relative;
+  
+  .form-control {
+    padding-right: 40px;
+  }
+  i {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.33);
+  }
+}

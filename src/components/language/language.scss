@@ -1,0 +1,15 @@
+.lang-group {
+  line-height: 60px;
+  display: flex;
+  justify-content: space-between;
+  width: 70px;
+  img {
+    height: 20px;
+    margin: auto;
+    cursor: pointer;
+  }
+}
+.current-lang {
+  line-height: 60px;
+  padding-left: 20px;
+}
