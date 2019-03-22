@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 const { REACT_APP_BASE_URL } = process.env;
 
 const request = axios.create({
-  baseURL: REACT_APP_BASE_URL + 'api/',
+  baseURL: REACT_APP_BASE_URL,
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json'
@@ -17,6 +17,7 @@ request.interceptors.request.use(
     // if (store.getters.token) {
     //   config.headers['Authorization'] = 'Bearer '
     // }
+    config.headers['Content-Type'] = 'Access-Control-Allow-Headers';
     return config;
   },
   error => {

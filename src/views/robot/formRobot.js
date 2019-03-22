@@ -1,218 +1,29 @@
 import React, { Component } from 'react';
 import Layout from '../layout/layout';
+import { toast } from 'react-toastify';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 import history from '../../utils/history';
 import Checkbox from '../../components/common/checkBox/checkBox';
+import { withTranslation } from 'react-i18next';
+import actions from '../../store/robot/actions';
+import roomActions from '../../store/room/actions';
+import algorithmActions from '../../store/algorithm/actions';
+import notifyActions from '../../store/notification/actions';
 
-const LIST_ROOM = [
-  {
-    id: 1,
-    name: 'Room luxury',
-    code: 'ROOM1',
-    type: 'luxury',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Room normal',
-    code: 'ROOM2',
-    type: 'normal',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-];
-const LIST_ALGORITHM = [
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  },
-  {
-    id: 1,
-    name: 'Algorithm 01',
-    code: 'AL01',
-    description: 'description abc',
-    status: true,
-    date: '09/10/2019',
-  },
-  {
-    id: 2,
-    name: 'Algorithm 02',
-    code: 'AL2',
-    description: 'description xyz',
-    status: false,
-    date: '09/10/2019',
-  }
-]
 class FormRobot extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      name: '',
-      room: '',
-      algorithms: [],
-      description: '',
+      isUpdate: false,
+      formValid: true,
+      showDropdownAlgorithm: false,
       listAlgorithm: [],
-      selectedRoom: null,
-      showDropdownAlgorithm: false
+
+      robotRoomId: '',
+      robotAlgorithmId: [],
+      describtion: '',
     }
   }
 
@@ -233,17 +44,16 @@ class FormRobot extends Component {
     let state = this.state;
     state.listAlgorithm[index].check = !state.listAlgorithm[index].check;
     if (state.listAlgorithm[index].check) {
-      state.algorithms.push(item.code);
+      state.robotAlgorithmId.push(item.id);
     } else {
-      state.algorithms = state.algorithms.filter(algorithm => algorithm !== item.code);
+      state.robotAlgorithmId = state.robotAlgorithmId.filter(algorithm => algorithm !== item.id);
     }
     this.setState(state);
   }
 
   onSelectRoom = (item) => {
     this.setState({
-      room: item.code,
-      selectedRoom: item
+      robotRoomId: item.id
     })
   } 
 
@@ -253,20 +63,49 @@ class FormRobot extends Component {
 
   componentDidMount() {
     const url = new URL(window.location);
-    const robotId = url.searchParams.get("robotId");
-    if (robotId) {
-      //Update
-      //TODO: load value to form
+    const roomId = url.searchParams.get("roomId");
+    if (roomId) {
       this.setState({
-        listAlgorithm: LIST_ALGORITHM
+        isUpdate: true
       })
+      this.props.get(roomId);
     } else {
-      // New
       this.setState({
-        listAlgorithm: LIST_ALGORITHM
+        isUpdate: false
       })
     }
+    this.props.getRooms();
+    this.props.getAlgorithms();
     document.addEventListener('mousedown', this.handleClickOutside);
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.detail !== this.props.detail) {
+      const detail = nextProps.detail;
+      if (detail) {
+        let robotAlgothmId = detail.listAlgorithm.map(item => {
+          return item.id
+        })
+        this.setState({
+          describtion: detail.desc,
+          robotRoomId: detail.roomId,
+          robotAlgorithmId: robotAlgothmId
+        })
+      }
+    }
+    if (nextProps.listPropsAlgorithms !== this.props.listPropsAlgorithms
+      && nextProps.listPropsAlgorithms.length > 0) {
+      this.setState({
+        listAlgorithm: nextProps.listPropsAlgorithms
+      })
+    }
+    if (nextProps.error !== '' && nextProps.error !== this.props.error) {
+      toast(nextProps.error);
+      this.props.clearNotify();
+    }
+    if (nextProps.message !== '' && nextProps.message !== this.props.message) {
+      toast(nextProps.message);
+      this.props.clearNotify();
+    }
   }
 
   handleChange = (e) => {
@@ -275,76 +114,172 @@ class FormRobot extends Component {
     })
   }
 
+  formValidate = () => {
+    const state = this.state;
+    let valid = state.describtion !== '' && state.robotRoomId !== '' && state.robotAlgorithmId.length > 0;
+    this.setState({
+      formValid: valid
+    })
+    return valid;
+  }
+
   handleSubmit = (e) => {
-    console.log(this.state);
+    const state = this.state;
+    if (this.formValidate()) {
+      if (state.isUpdate) {
+        const data = {
+          robotRoomId: state.robotRoomId,
+          describtion: state.describtion,
+          robotAlgorithmId: state.robotAlgorithmId
+        }
+        this.props.update(data);
+      } else {
+        const data = {
+          robotRoomId: state.robotRoomId,
+          describtion: state.describtion,
+          robotAlgorithmId: state.robotAlgorithmId
+        }
+        this.props.create(data);
+      }
+    }
+    
     e.preventDefault();
   }
 
   render() {
     const {
-      name,
-      algorithms,
-      description,
+      isUpdate,
+      showDropdownAlgorithm,
       listAlgorithm,
-      selectedRoom,
-      showDropdownAlgorithm
+      formValid,
+
+      robotRoomId,
+      robotAlgorithmId,
+      describtion,
     } = this.state;
+    const { t, listPropsRoom } = this.props;
+    let selectedRoom = null;
+    if (robotRoomId) {
+      for (let i = 0; i < listPropsRoom.length; i ++) {
+        if (listPropsRoom[i].id === robotRoomId) {
+          selectedRoom = listPropsRoom[i];
+        }
+      }
+    }
+
+    let convertedListAlgorithm = listAlgorithm;
+    let selectedAlgotithm = [];
+    if(robotAlgorithmId.length > 0) {
+      for (let i = 0; i < robotAlgorithmId.length; i ++) {
+        for (let j = 0; j < convertedListAlgorithm.length; j ++) {
+          if (robotAlgorithmId[i] === convertedListAlgorithm[j].id) {
+            convertedListAlgorithm[j].check = true;
+            selectedAlgotithm.push(convertedListAlgorithm[j].name);
+          }
+        }
+      }
+    }
 
     return(
       <Layout title="">
         <form className='form-content' onSubmit={this.handleSubmit}>
-          <h3 className='form-title'>Add Robot</h3>
+          <h3 className='form-title'>{t('Add-Robot')}</h3>
           <div className='form-group'>
-            <label className='field-title'>Name</label>
-            <input type='text' className='form-control' value={name} name='name' onChange={this.handleChange} required/>
-          </div>
-          <div className='form-group'>
-            <label className='field-title'>Room</label>
+            <label className='field-title'>{t('Rooms')}</label>
             <div className="btn-group dropdown-custom">
-              <button type="button" className="btn dropdown-toggle" data-toggle="dropdown"
+              <button type="button" disabled={isUpdate} className="btn dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-                {selectedRoom ? selectedRoom.name : "Select room"}
+                {selectedRoom ? selectedRoom.name : t('Select-Room')}
               </button>
               <div className="dropdown-menu">
                 {
-                  LIST_ROOM.map((item, index) => {
+                  listPropsRoom.map((item, index) => {
                     return <span key={index} className="dropdown-item" onClick={() => this.onSelectRoom(item)}>{item.name}</span>
                   })
                 }
               </div>
             </div>
+            {
+              !formValid && robotRoomId === '' && <div className='block-error'>{t('Field-Required')}</div> 
+            }
           </div>
           <div className='form-group'>
-            <label className='field-title'>Algorithms</label>
+            <label className='field-title'>{t('Algorithms')}</label>
             <div className="btn-group dropdown-custom" >
               <button type="button" className="btn dropdown-toggle dropdown-select"
                 aria-haspopup="true" aria-expanded="false" onClick={() => this.showDropdownAlgorithm(true)}>
-                {algorithms.length > 0 ? algorithms.toString() : "Select algorithms"}
+                {selectedAlgotithm.length > 0 ? selectedAlgotithm.toString() : t('Select-Algorithm')}
               </button>
-              <div ref={this.setWrapperRef} id="dropdown-algorithms" className={showDropdownAlgorithm ? "dropdown-menu show" : "dropdown-menu"} >
+              <div ref={this.setWrapperRef} id="dropdown-algorithms"
+                className={showDropdownAlgorithm ? "dropdown-menu show" : "dropdown-menu"} >
                 {
-                  listAlgorithm.map((item, index) => {
-                    return <Checkbox key={index} title={item.name} checked={item.check} value={index} onChange={() => this.onSelectAlgorithm(index, item)} />
+                  convertedListAlgorithm.map((item, index) => {
+                    return <Checkbox key={index} title={item.name} checked={item.check}
+                    value={index} onChange={() => this.onSelectAlgorithm(index, item)} />
                   })
                 }
               </div>
             </div>
+            {
+              !formValid && selectedAlgotithm.length === 0 && <div className='block-error'>{t('Field-Required')}</div> 
+            }
           </div>
           <div className='form-group'>
-            <label className='field-title'>Description</label>
-            <textarea row='4' className='form-control' value={description} name='description' onChange={this.handleChange} required/>
+            <label className='field-title'>{t('Des')}</label>
+            <textarea row='4' className='form-control' value={describtion} name='describtion'
+              onChange={this.handleChange}/>
+            {
+              !formValid && robotRoomId === '' && <div className='block-error'>{t('Field-Required')}</div> 
+            }
           </div>
 
           <div className='form-group btn-form-group'>
-            <button type="submit" className="btn btn-primary">Submit</button>
-            <button type="cancel" className="btn btn-secondary" onClick={() => history.push({ pathname: '/robots'})}>Cancel</button>
+            <button type="submit" className="btn btn-primary">{t('Submit')}</button>
+            <button type="cancel" className="btn btn-secondary"
+              onClick={() => history.push({ pathname: '/robots'})}>{t('Cancel')}</button>
           </div>
           
         </form>
       </Layout>
     );
   }
-
 }
 
-export default FormRobot;
+const mapStateToProps = state => {
+  return {
+    detail: state.Robots.detail,
+    error: state.Notifys.error,
+    message: state.Notifys.message,
+    listPropsRoom: state.Rooms.list,
+    listPropsAlgorithms: state.Algorithms.list
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    getRooms: () => {
+      dispatch(roomActions.list("", 0, 100000));
+    },
+    getAlgorithms: () => {
+      dispatch(algorithmActions.list("", 0, 100000));
+    },
+    get: (id) => {
+      dispatch(actions.get(id));
+    },
+    create: (body) => {
+      dispatch(actions.create(body))
+    },
+    update: (body) => {
+      dispatch(actions.update(body))
+    },
+    clearNotify: () => {
+      dispatch(notifyActions.clearNotify());
+    }
+  }
+};
+
+
+export default compose(
+  withTranslation(),
+  connect(mapStateToProps, mapDispatchToProps)
+)(FormRobot);

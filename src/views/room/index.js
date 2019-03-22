@@ -3,12 +3,16 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
 import ReactTable from 'react-table';
-import { withTranslation } from 'react-i18next';
 import 'react-table/react-table.css';
-
+import { toast } from 'react-toastify';
+import Pagination from 'react-js-pagination';
+import { withTranslation } from 'react-i18next';
 import Layout from '../layout/layout';
 import SearchBar from '../../components/searchBar/searchBar';
 import history from '../../utils/history';
+import actions from '../../store/room/actions';
+import notifyActions from '../../store/notification/actions';
+import { DEFAULT_TABLE, ROOM_TYPE } from '../../utils/constant';
 
 class Room extends Component {
 
@@ -16,7 +20,9 @@ class Room extends Component {
     super(props);
 
     this.state = {
-      searchKey: ""
+      searchKey: "",
+      pageNum: DEFAULT_TABLE.pageNum,
+      pageSize: DEFAULT_TABLE.pageSize
     }
   }
 
@@ -28,63 +34,106 @@ class Room extends Component {
   onEnter = (e) => {
     const key = e.which || e.keyCode;
     if (key === 13) {
-      alert(this.state.searchKey);
+      this.props.fetchRooms(this.state.searchKey, this.state.pageNum - 1, this.state.pageSize);
     }
   }
   onRequestSearch = () => {
-    alert(this.state.searchKey);
+    this.props.fetchRooms(this.state.searchKey, this.state.pageNum - 1, this.state.pageSize);
+  }
+
+  onChangePageSize = (size) => {
+    this.setState({
+      pageSize: size,
+      pageNum: DEFAULT_TABLE.pageNum
+    })
+  }
+  onChangePageNum = (pageNum) => {
+    this.setState({
+      pageNum: pageNum
+    })
+  }
+
+  componentDidMount() {
+    this.props.fetchRooms(this.state.searchKey, this.state.pageNum - 1, this.state.pageSize);
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.error !== '' && nextProps.error !== this.props.error) {
+      toast(nextProps.error);
+      this.props.clearNotify();
+    }
+    if (nextProps.message !== '' && nextProps.message !== this.props.message) {
+      toast(nextProps.message);
+      this.props.clearNotify();
+      this.props.fetchRooms(this.state.searchKey, this.state.pageNum - 1, this.state.pageSize);
+    }
+  }
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.pageSize !== this.state.pageSize || nextState.pageNum !== this.state.pageNum) {
+      let start = (nextState.pageNum - 1) * nextState.pageSize;
+      let limit = nextState.pageSize;
+      this.props.fetchRooms(nextState.searchKey, start, limit);
+    }
   }
   
   render() {
 
-    const { t } = this.props;
+    const { t, rooms, total } = this.props;
     const columns = [
-    {
-      Header: t('Name'),
-      accessor: 'name'
-    },
-    {
-      Header: t('Code'),
-      accessor: 'code'
-    },
-    {
-      Header: t('Type'),
-      accessor: 'type'
-    },
-    {
-      Header: t('Des'),
-      accessor: 'description'
-    },
-    {
-      id: 'roomStatus',
-      Header: t('Status'),
-      accessor: row => [row.id, row.status],
-      Cell: props => <div className='status-table-row'>
-        <span className={props.value[1] ? 'active' : 'deactive'}>{props.value[1] ? t('Active') : t('Deactivate')}</span>
-        {
-          props.value[1] ? <i className="fas fa-pause" data-toggle="tooltip" data-placement="bottom" title="Deactive"
-            onClick={() => alert(`Deactive item: ${props.value[0]}`)}></i>
-          : <i className="fas fa-play" data-toggle="tooltip" data-placement="bottom" title="Active"
-            onClick={() => alert(`Active item: ${props.value[0]}`)}></i>
-        }
-      </div>
-    },
-    {
-      Header: t('Date'),
-      accessor: 'date'
-    },
-    {
-      id: 'roomId',
-      Header: t('Action'),
-      accessor: row => row.id,
-      Cell: props => <div className='action-table-row'>
-        <i className="fas fa-trash-alt" data-toggle="tooltip" data-placement="bottom" title={t('Delete')}
-          onClick={() => alert(`Delete item: ${props.value}`)}></i>
-        <i className="fas fa-edit" data-toggle="tooltip" data-placement="bottom" title={t('Edit')}
-          onClick={() => history.push(`/form-room?roomId=${props.value}`)} ></i>
-      </div>
-    }
-  ];
+      {
+        Header: t('Name'),
+        accessor: 'name',
+        Cell: props => <div className='table-right-element'>
+          {props.value}
+        </div>
+      },
+      // {
+      //   Header: t('Code'),
+      //   accessor: 'room',
+      //   Cell: props => <div className='table-right-element'>
+      //     {props.value}
+      //   </div>
+      // },
+      {
+        Header: t('Type'),
+        accessor: 'type',
+        Cell: props => <div className='table-right-element'>
+          {
+            ROOM_TYPE.map((item, index) => {
+              return item.code === props.value ? <span key={index}>{item.name}</span> : null
+            })
+          }
+        </div>
+      },
+      {
+        Header: t('Date'),
+        accessor: 'createdDate',
+        Cell: props => <div className='table-right-element'>
+          { props.value }
+        </div>
+      },
+      {
+        Header: t('Des'),
+        accessor: 'description',
+        Cell: props => <div className='table-right-element'>
+          {props.value}
+        </div>
+      },
+      {
+        id: 'roomId',
+        Header: t('Action'),
+        accessor: row => row.id,
+        Cell: props => <div className='action-table-row'>
+          {/* <i className="fas fa-trash-alt" data-toggle="tooltip" data-placement="bottom" title={t('Delete')}
+            onClick={() => alert(`Delete item: ${props.value}`)}></i> */}
+          <i className="fas fa-edit" data-toggle="tooltip" data-placement="bottom" title={t('Edit')}
+            onClick={() => history.push(`/form-room?roomId=${props.value}`)} ></i>
+        </div>
+      }
+    ];
+    const {
+      pageNum,
+      pageSize
+    } = this.state;
 
     return (
       <Layout title="">
@@ -97,7 +146,7 @@ class Room extends Component {
             onClick={() => history.push({ pathname: '/form-room'})}>{t('AddNew')}</button>
         </div>
         <ReactTable
-          data={this.props.rooms}
+          data={rooms}
           columns={columns}
           defaultPageSize={5}
           previousText={t('preText')}
@@ -105,8 +154,38 @@ class Room extends Component {
           noDataText={t('noData')}
           pageText={t('pageText')}
           ofText={t('ofText')}
-          rowsText={t('rowsText')}>
+          rowsText={t('rowsText')}
+          pageSize={pageSize}
+          showPagination={false}
+          resizable={false} >
         </ReactTable>
+
+        <div className="d-flex flex-row-reverse">
+          <Pagination
+            firstPageText={<i className="fas fa-angle-double-left"></i>}
+            lastPageText={<i className="fas fa-angle-double-right"></i>}
+            prevPageText={<i className="fas fa-angle-left"></i>}
+            nextPageText={<i className="fas fa-angle-right"></i>}
+            activePage={pageNum}
+            itemsCountPerPage={pageSize}
+            totalItemsCount={total}
+            onChange={this.onChangePageNum}
+          />
+          <div className='form-group sort-by'>
+            <label>{t('sortBy')}</label>
+            <div className="dropdown">
+              <button className="btn dropdown-toggle" type="button" id="dropdownRows" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {`${pageSize} ${t('rowsText')}`}
+              </button>
+              <div className="dropdown-menu dropdown-menu-right select-row" aria-labelledby="dropdownRows">
+                <button className="dropdown-item" href="#" onClick={(e) => this.onChangePageSize(5)}>{`5 ${t('rowsText')}`}</button>
+                <button className="dropdown-item" onClick={(e) => this.onChangePageSize(10)}>{`10 ${t('rowsText')}`}</button>
+                <button className="dropdown-item" onClick={(e) => this.onChangePageSize(15)}>{`15 ${t('rowsText')}`}</button>
+                <button className="dropdown-item" onClick={(e) => this.onChangePageSize(20)}>{`20 ${t('rowsText')}`}</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </Layout>
     );
   }
@@ -118,11 +197,26 @@ Room.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    rooms: state.Rooms.list
+    rooms: state.Rooms.list,
+    total: state.Rooms.total,
+    error: state.Notifys.error,
+    message: state.Notifys.message
   };
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchRooms: (searchKey, start, limit) => {
+      dispatch(actions.list(searchKey, start, limit));
+    },
+    changeStatus: (id, status) => {
+      dispatch(actions.changeStatus(id, status));
+    },
+    clearNotify: () => {
+      dispatch(notifyActions.clearNotify());
+    }
+  }
+};
 
 export default compose(
   withTranslation(),

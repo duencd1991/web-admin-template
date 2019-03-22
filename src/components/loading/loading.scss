@@ -1,0 +1,11 @@
+.loading-box {
+  width: 20vw;
+  height: 20vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  img {
+    height: 100%;
+  }
+}

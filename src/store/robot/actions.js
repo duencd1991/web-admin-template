@@ -7,12 +7,21 @@ const actions = {
   ROBOT_DETAIL: 'ROBOT_DETAIL',
   ROBOT_UPDATE: 'ROBOT_UPDATE',
   ROBOT_ERROR: 'ROBOT_ERROR',
-  list: () => ({
-    type: actions.ROBOT_LIST
+  list: (searchKey, start, limit) => ({
+    type: actions.ROBOT_LIST,
+    searchKey, start, limit
   }),
-  detail: id => ({
-    type: actions.ROBOT_DETAIL,
+  get: id => ({
+    type: actions.ROBOT_GET,
     id
+  }),
+  create: body => ({
+    type: actions.ROBOT_CREATE,
+    body
+  }),
+  update: body => ({
+    type: actions.ROBOT_UPDATE,
+    body
   })
 };
 export default actions;

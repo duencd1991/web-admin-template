@@ -5,6 +5,7 @@ import './layout.scss';
 import headerActions from '../../store/header/actions';
 import Header from '../../components/header/header';
 import LeftSideBar from '../../components/leftSideBar/leftSideBar';
+import Loading from '../../components/loading/loading';
 
 const Layout = props => (
   <React.Fragment>
@@ -16,6 +17,9 @@ const Layout = props => (
     {
       props.statusMenu && <div className='bodyClick' onClick={props.hideMenu}></div>
     }
+    {
+      props.loading && <Loading />
+    }
   </React.Fragment>
 );
 
@@ -25,7 +29,8 @@ Layout.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    statusMenu: state.Header.showMenu
+    statusMenu: state.Header.showMenu,
+    loading: state.Notifys.loading
   };
 };
 

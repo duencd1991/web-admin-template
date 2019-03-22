@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 // import component
 import history from '../utils/history';
 import RootContainer from './rootContainer';
-import Home from './home';
 import Room from './room';
 import FormRoom from './room/formRoom';
 import Robot from './robot';
@@ -19,7 +18,7 @@ const AppRouter = () => {
     <Router history={history}>
       <RootContainer>
         <Switch>
-          <Route exact path="/" component={Home} />
+          <Route exact path="/" component={Algorithm} />
           <Route exact path="/rooms" component={Room} />
           <Route exact path="/form-room" component={FormRoom} />
           <Route exact path="/algorithms" component={Algorithm} />

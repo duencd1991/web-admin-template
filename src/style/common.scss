@@ -28,6 +28,15 @@ body {
       height: 38px;
     }
   }
+  .table-right-element {
+    text-align: right;
+  }
+  .table-left-element {
+    text-align: left;
+  }
+  .table-center-element {
+    text-align: center;
+  }
   .status-table-row {
     display: flex;
     justify-content: space-evenly;
@@ -56,12 +65,61 @@ body {
       cursor: pointer;
     }
   }
+  .sort-by {
+    display: flex;
+    margin: 10px;
+    height: 40px;
+
+    label {
+      margin: 0;
+      height: 40px;
+      line-height: 40px;
+      font-weight: 500;
+    }
+  }
+  .pagination {
+    margin: 10px;
+    justify-content: center;
+    color: #a0a0a0;
+    font-size: 14px;
+    font-family: "Roboto-Medium";
+    padding-top: 5px;
+    li {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      cursor: pointer;
+    }
+    li:hover {
+      background-color: rgba(3, 169, 244, 0.05);
+    }
+    .active {
+      background-color: #26c6da;
+      color: #ffffff;
+    }
+    .active:hover {
+      background-color: #26c6da;
+      color: #ffffff;
+    }
+    .disabled {
+      cursor: not-allowed;
+      a {
+        cursor: not-allowed;
+      }
+    }
+  }
   .form-content {
     max-width: 500px;
-    margin: auto;
+    margin: 30px auto;
     border: 1px solid rgba(0, 0, 0, 0.2);
     padding: 20px;
     border-radius: 25px;
+    .block-error {
+      font-size: 14px;
+      color: red;
+      font-style: italic;
+    }
     .form-title {
       margin-bottom: 20px;
     }
@@ -89,6 +147,8 @@ body {
       }
       .dropdown-toggle {
         text-align: left;
+        white-space: pre-wrap;
+        padding: 5px;
       }
       .dropdown-toggle::after {
         position: absolute;

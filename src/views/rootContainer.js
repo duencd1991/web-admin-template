@@ -22,4 +22,5 @@ const RootContainer = props => {
     </div>
   );
 };
+
 export default RootContainer;
